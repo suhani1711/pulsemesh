@@ -45,7 +45,8 @@ export const SosPage: React.FC = () => {
   const [peopleCount, setPeopleCount] = useState(1);
   const [coords, setCoords] = useState<Coordinates>(DEFAULT_COORDS);
   const [isLocating, setIsLocating] = useState(false);
-  const [manualCoords, setManualCoords] = useState(false);
+  const [manualCoords, setManualCoords] = useState(true);
+  const [locationConfirmed, setLocationConfirmed] = useState(false);
   const [validationError, setValidationError] = useState('');
 
   // Category Configuration
@@ -66,10 +67,12 @@ export const SosPage: React.FC = () => {
     if (result.coords) {
       setCoords(result.coords);
       setManualCoords(false);
-      showToast('GPS coordinates acquired with precision.', 'success');
+      setLocationConfirmed(true);
+      showToast('GPS coordinates acquired. Check that the pin is accurate.', 'success');
     } else {
       setManualCoords(true);
-      showToast(result.error || 'GPS unavailable. Switched to manual coordinates.', 'info');
+      setLocationConfirmed(false);
+      showToast(result.error || 'GPS unavailable. Enter your actual coordinates manually.', 'info');
     }
   };
 
@@ -82,6 +85,10 @@ export const SosPage: React.FC = () => {
     }
     if (peopleCount < 1) {
       setValidationError('Number of people affected must be at least 1.');
+      return;
+    }
+    if (!locationConfirmed || !Number.isFinite(coords.lat) || !Number.isFinite(coords.lng) || coords.lat < -90 || coords.lat > 90 || coords.lng < -180 || coords.lng > 180) {
+      setValidationError('Get your GPS location or enter valid latitude and longitude before submitting. Placeholder coordinates are never sent.');
       return;
     }
     setValidationError('');
@@ -111,9 +118,16 @@ export const SosPage: React.FC = () => {
       ],
     };
 
-    await createAlert(newAlert);
+    try {
+      await createAlert(newAlert);
+    } catch (error) {
+      console.error('Unable to save SOS alert:', error);
+      setValidationError('Could not save this alert to local storage. Check browser storage permissions and try again.');
+      return;
+    }
 
-    setSubmittedAlert(newAlert);
+    const savedAlert = useSosStore.getState().alerts.find((alert) => alert.id === newAlertId) || newAlert;
+    setSubmittedAlert(savedAlert);
     setIsModalOpen(false);
 
     // Reset Form
@@ -123,10 +137,10 @@ export const SosPage: React.FC = () => {
     setPeopleCount(1);
 
     showToast(
-      connectedCount > 0
-        ? `SOS ${newAlertId} broadcast to ${connectedCount} local peer(s)!`
-        : `SOS ${newAlertId} queued in outbox. Will relay as peers join.`,
-      'success'
+      savedAlert.status === 'broadcast_locally'
+        ? `SOS ${newAlertId} sent to an available peer transport. Waiting for peer acknowledgement.`
+        : `SOS ${newAlertId} saved on this device. No peer confirmed receipt; it remains queued.`,
+      savedAlert.status === 'broadcast_locally' ? 'success' : 'info'
     );
   };
 
@@ -489,7 +503,10 @@ export const SosPage: React.FC = () => {
                     type="number"
                     step="0.0001"
                     value={coords.lat}
-                    onChange={(e) => setCoords({ ...coords, lat: parseFloat(e.target.value) || 0, isManual: true })}
+                    onChange={(e) => {
+                      setCoords({ ...coords, lat: e.target.value === '' ? 0 : Number(e.target.value), isManual: true });
+                      setLocationConfirmed(true);
+                    }}
                     className="w-full px-2 py-1 rounded bg-slate-800 border border-slate-700 text-xs font-mono text-white focus:outline-none"
                   />
                 </div>
@@ -499,7 +516,10 @@ export const SosPage: React.FC = () => {
                     type="number"
                     step="0.0001"
                     value={coords.lng}
-                    onChange={(e) => setCoords({ ...coords, lng: parseFloat(e.target.value) || 0, isManual: true })}
+                    onChange={(e) => {
+                      setCoords({ ...coords, lng: e.target.value === '' ? 0 : Number(e.target.value), isManual: true });
+                      setLocationConfirmed(true);
+                    }}
                     className="w-full px-2 py-1 rounded bg-slate-800 border border-slate-700 text-xs font-mono text-white focus:outline-none"
                   />
                 </div>
