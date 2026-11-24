@@ -24,7 +24,7 @@ export const OverviewPage: React.FC = () => {
 
   const activeAlerts = alerts.filter((a) => a.status !== 'delivered');
   const criticalCount = alerts.filter((a) => a.priority === 'critical').length;
-  const connectedPeers = peers.filter((p) => p.status === 'connected');
+  const connectedPeers = peers.filter((p) => p.status === 'connected' && !p.isSimulated);
 
   const formatTime = (ts: number) => {
     const diff = Math.floor((Date.now() - ts) / 60000);
@@ -73,12 +73,14 @@ export const OverviewPage: React.FC = () => {
           </div>
           <div>
             <div className="text-xl font-bold text-white flex items-center gap-2">
-              <span>{isOnline ? 'Online Grid' : 'Off-Grid Mesh'}</span>
+              <span>{isOnline ? 'Online' : connectedPeers.length > 0 ? 'Local P2P' : 'Offline'}</span>
             </div>
             <p className="text-xs text-slate-400 mt-1">
               {isOnline
-                ? 'Standard web internet reachable'
-                : 'Isolated node using P2P browser bus'}
+                ? 'Internet connection detected'
+                : connectedPeers.length > 0
+                  ? 'Connected to real browser peers'
+                  : 'No internet or connected peer detected'}
             </p>
           </div>
         </div>
@@ -96,7 +98,7 @@ export const OverviewPage: React.FC = () => {
             <p className="text-xs text-slate-400 mt-1">
               {connectedPeers.length > 0
                 ? `${connectedPeers.length} active radio links`
-                : '0 direct peers. Tab broadcast active'}
+                : 'No real peer connection'}
             </p>
           </div>
         </div>
