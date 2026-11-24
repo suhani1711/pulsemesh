@@ -79,7 +79,7 @@ export const useSosStore = create<SosState>((set, get) => ({
     // 5. Attempt P2P broadcast via Mesh Manager
     try {
       const broadcastResult = await meshManager.broadcastSosAlert(newAlert);
-      if (broadcastResult.peerCount > 0) {
+      if (broadcastResult.success && broadcastResult.peerCount > 0) {
         await get().updateAlertStatus(
           newAlert.id,
           'broadcast_locally',
@@ -89,7 +89,7 @@ export const useSosStore = create<SosState>((set, get) => ({
         await get().updateAlertStatus(
           newAlert.id,
           'queued',
-          'No peers currently reachable. Queued for auto-relay.'
+          'No peer confirmed receipt. Kept in the local outbox.'
         );
       }
     } catch (err) {
