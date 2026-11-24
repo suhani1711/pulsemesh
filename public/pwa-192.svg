@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 192 192" width="192" height="192">
+  <rect width="192" height="192" rx="40" fill="#07111F"/>
+  <circle cx="96" cy="96" r="76" stroke="#00D9FF" stroke-opacity="0.2" stroke-width="2" fill="none"/>
+  <circle cx="96" cy="96" r="54" stroke="#FF3B4F" stroke-opacity="0.3" stroke-width="2" fill="none"/>
+  <!-- Shield outline -->
+  <path d="M96 36 L138 52 C138 98 116 130 96 148 C76 130 54 98 54 52 Z" fill="#0D1B2A" stroke="#00D9FF" stroke-width="4" stroke-linejoin="round"/>
+  <!-- Pulse node mesh -->
+  <path d="M72 96 L90 76 L102 116 L120 96" fill="none" stroke="#FF3B4F" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+  <!-- Mesh nodes -->
+  <circle cx="96" cy="62" r="5" fill="#00D9FF"/>
+  <circle cx="72" cy="96" r="4.5" fill="#32E875"/>
+  <circle cx="120" cy="96" r="4.5" fill="#00D9FF"/>
+  <circle cx="96" cy="132" r="5" fill="#FF3B4F"/>
+</svg>

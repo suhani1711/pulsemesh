@@ -1,0 +1,77 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --bg-primary: #07111F;
+  --surface-primary: #0D1B2A;
+  --surface-secondary: #152942;
+  --accent-cyan: #00D9FF;
+  --emergency-red: #FF3B4F;
+  --rescue-green: #32E875;
+  --text-primary: #FFFFFF;
+  --text-secondary: #9FB3C8;
+  --border-color: rgba(0, 217, 255, 0.15);
+}
+
+/* High Contrast Mode Tokens */
+html.high-contrast {
+  --bg-primary: #000000;
+  --surface-primary: #121212;
+  --surface-secondary: #222222;
+  --accent-cyan: #00FFFF;
+  --emergency-red: #FF1A35;
+  --rescue-green: #00FF66;
+  --text-primary: #FFFFFF;
+  --text-secondary: #FFFFFF;
+  --border-color: #FFFFFF;
+}
+
+/* Large Button Mode helper */
+body.large-button-mode button,
+body.large-button-mode a.btn,
+body.large-button-mode [role="button"] {
+  min-height: 56px !important;
+  min-width: 56px !important;
+  font-size: 1.1rem !important;
+  padding-left: 1.5rem !important;
+  padding-right: 1.5rem !important;
+}
+
+/* Accessible focus ring */
+*:focus-visible {
+  outline: 2px solid var(--accent-cyan);
+  outline-offset: 3px;
+}
+
+/* Glassmorphism utility */
+.glass-panel {
+  background: rgba(13, 27, 42, 0.75);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(0, 217, 255, 0.15);
+}
+
+.glass-panel-glow {
+  background: rgba(13, 27, 42, 0.85);
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba(0, 217, 255, 0.3);
+  box-shadow: 0 0 20px rgba(0, 217, 255, 0.1);
+}
+
+.glass-panel-emergency {
+  background: rgba(255, 59, 79, 0.08);
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 59, 79, 0.4);
+  box-shadow: 0 0 25px rgba(255, 59, 79, 0.15);
+}
+
+/* Respect user's motion preferences */
+@media (prefers-reduced-motion: reduce) {
+  *, ::before, ::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
