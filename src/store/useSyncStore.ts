@@ -2,6 +2,8 @@ import { create } from 'zustand';
 import { dbGetOutboxQueue } from '../lib/db';
 import { syncService } from '../lib/sync';
 
+let syncInitialized = false;
+
 export interface BatteryInfo {
   level: number | null; // 0.0 to 1.0
   charging: boolean | null;
@@ -33,6 +35,8 @@ export const useSyncStore = create<SyncState>((set, get) => ({
   networkMode: 'online',
 
   initSync: async () => {
+    if (syncInitialized) return;
+    syncInitialized = true;
     await get().refreshOutboxCount();
 
     // Setup window online/offline listeners
