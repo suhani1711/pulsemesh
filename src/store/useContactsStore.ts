@@ -1,7 +1,6 @@
 import { create } from 'zustand';
 import { EmergencyContact } from '../types';
 import { dbGetAllContacts, dbSaveContact, dbDeleteContact } from '../lib/db';
-import { INITIAL_DEFAULT_CONTACTS } from '../data/demoData';
 
 interface ContactsState {
   contacts: EmergencyContact[];
@@ -19,16 +18,10 @@ export const useContactsStore = create<ContactsState>((set) => ({
   loadContacts: async () => {
     set({ isLoading: true });
     try {
-      let stored = await dbGetAllContacts();
-      if (!stored || stored.length === 0) {
-        for (const c of INITIAL_DEFAULT_CONTACTS) {
-          await dbSaveContact(c);
-        }
-        stored = INITIAL_DEFAULT_CONTACTS;
-      }
+      const stored = await dbGetAllContacts();
       set({ contacts: stored, isLoading: false });
     } catch {
-      set({ contacts: INITIAL_DEFAULT_CONTACTS, isLoading: false });
+      set({ contacts: [], isLoading: false });
     }
   },
 
