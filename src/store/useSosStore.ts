@@ -35,20 +35,13 @@ export const useSosStore = create<SosState>((set, get) => ({
   loadAlerts: async () => {
     set({ isLoading: true });
     try {
-      let stored = await dbGetAllAlerts();
-      if (!stored || stored.length === 0) {
-        // Seed initial demo data for immediate interactivity
-        for (const demoAlert of INITIAL_DEMO_ALERTS) {
-          await dbSaveAlert(demoAlert);
-        }
-        stored = INITIAL_DEMO_ALERTS;
-      }
+      const stored = await dbGetAllAlerts();
       // Sort newest first
       stored.sort((a, b) => b.timestamp - a.timestamp);
       set({ alerts: stored, isLoading: false });
     } catch (err) {
       console.error('Failed to load alerts from IndexedDB:', err);
-      set({ alerts: INITIAL_DEMO_ALERTS, isLoading: false });
+      set({ alerts: [], isLoading: false });
     }
   },
 
