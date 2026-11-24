@@ -16,7 +16,6 @@ import {
   Compass
 } from 'lucide-react';
 import { useSosStore } from '../../store/useSosStore';
-import { useMeshStore } from '../../store/useMeshStore';
 import { useToast } from '../../components/common/Toast';
 import { Modal } from '../../components/common/Modal';
 import { ConfirmDialog } from '../../components/common/ConfirmDialog';
@@ -29,7 +28,6 @@ export const SosPage: React.FC = () => {
   const navigate = useNavigate();
   const { showToast } = useToast();
   const { alerts, createAlert, deleteAlert } = useSosStore();
-  const { peers } = useMeshStore();
 
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isConfirmingDelete, setIsConfirmingDelete] = useState<string | null>(null);
@@ -94,8 +92,6 @@ export const SosPage: React.FC = () => {
     setValidationError('');
 
     const newAlertId = generateSosId();
-    const connectedCount = peers.filter((p) => p.status === 'connected').length;
-
     const newAlert: SosAlert = {
       id: newAlertId,
       timestamp: Date.now(),
@@ -505,7 +501,7 @@ export const SosPage: React.FC = () => {
                     value={coords.lat}
                     onChange={(e) => {
                       setCoords({ ...coords, lat: e.target.value === '' ? 0 : Number(e.target.value), isManual: true });
-                      setLocationConfirmed(true);
+                      setLocationConfirmed(false);
                     }}
                     className="w-full px-2 py-1 rounded bg-slate-800 border border-slate-700 text-xs font-mono text-white focus:outline-none"
                   />
@@ -523,6 +519,15 @@ export const SosPage: React.FC = () => {
                     className="w-full px-2 py-1 rounded bg-slate-800 border border-slate-700 text-xs font-mono text-white focus:outline-none"
                   />
                 </div>
+                <label className="col-span-2 flex items-start gap-2 text-xs text-amber-300">
+                  <input
+                    type="checkbox"
+                    checked={locationConfirmed}
+                    onChange={(e) => setLocationConfirmed(e.target.checked)}
+                    className="mt-0.5 accent-cyan-400"
+                  />
+                  I confirm these manually entered coordinates are my actual current location.
+                </label>
               </div>
             ) : (
               <div className="text-xs text-slate-400 font-mono">
