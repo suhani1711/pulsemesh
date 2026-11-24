@@ -180,11 +180,12 @@ export class MeshManager {
       hopCount: 0,
     });
 
+    let sentAny = false;
     for (const transport of this.transports.values()) {
-      await transport.sendMessage(message);
+      if (await transport.sendMessage(message)) sentAny = true;
     }
 
-    return { success: true, peerCount: this.getAllPeers().length };
+    return { success: sentAny, peerCount: this.getAllPeers().length };
   }
 
   /**
