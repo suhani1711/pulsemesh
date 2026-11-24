@@ -19,7 +19,19 @@ export const useContactsStore = create<ContactsState>((set) => ({
     set({ isLoading: true });
     try {
       const stored = await dbGetAllContacts();
-      set({ contacts: stored, isLoading: false });
+      // Remove the fixed sample contacts inserted by older demo builds.
+      const sampleContacts = stored.filter((contact) =>
+        contact.id === 'c-primary-family' || contact.id === 'c-red-cross'
+      );
+      for (const sample of sampleContacts) {
+        await dbDeleteContact(sample.id);
+      }
+      set({
+        contacts: stored.filter((contact) =>
+          contact.id !== 'c-primary-family' && contact.id !== 'c-red-cross'
+        ),
+        isLoading: false,
+      });
     } catch {
       set({ contacts: [], isLoading: false });
     }
