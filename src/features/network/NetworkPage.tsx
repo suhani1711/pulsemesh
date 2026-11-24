@@ -111,7 +111,12 @@ export const NetworkPage: React.FC = () => {
 
   const handleSendBeacon = async () => {
     const res = await sendBeacon();
-    showToast(`Test beacon broadcasted across all active transports (${res.peerCount} peers)`, 'success');
+    showToast(
+      res.success
+        ? `Test beacon sent through active transports (${res.peerCount} known peers)`
+        : 'No connected peer received the test beacon. Check the connection first.',
+      res.success ? 'success' : 'info'
+    );
   };
 
   // Auto scan broadcast channel peers on load

@@ -35,20 +35,18 @@ export const useSosStore = create<SosState>((set, get) => ({
   loadAlerts: async () => {
     set({ isLoading: true });
     try {
-      let stored = await dbGetAllAlerts();
-      if (!stored || stored.length === 0) {
-        // Seed initial demo data for immediate interactivity
-        for (const demoAlert of INITIAL_DEMO_ALERTS) {
-          await dbSaveAlert(demoAlert);
-        }
-        stored = INITIAL_DEMO_ALERTS;
+      const stored = await dbGetAllAlerts();
+      // Remove sample alerts created by older demo builds from this browser.
+      const realAlerts = stored.filter((alert) => !alert.isDemo);
+      for (const demoAlert of stored.filter((alert) => alert.isDemo)) {
+        await dbDeleteAlert(demoAlert.id);
       }
       // Sort newest first
-      stored.sort((a, b) => b.timestamp - a.timestamp);
-      set({ alerts: stored, isLoading: false });
+      realAlerts.sort((a, b) => b.timestamp - a.timestamp);
+      set({ alerts: realAlerts, isLoading: false });
     } catch (err) {
       console.error('Failed to load alerts from IndexedDB:', err);
-      set({ alerts: INITIAL_DEMO_ALERTS, isLoading: false });
+      set({ alerts: [], isLoading: false });
     }
   },
 
@@ -79,7 +77,7 @@ export const useSosStore = create<SosState>((set, get) => ({
     // 5. Attempt P2P broadcast via Mesh Manager
     try {
       const broadcastResult = await meshManager.broadcastSosAlert(newAlert);
-      if (broadcastResult.peerCount > 0) {
+      if (broadcastResult.success && broadcastResult.peerCount > 0) {
         await get().updateAlertStatus(
           newAlert.id,
           'broadcast_locally',
@@ -89,7 +87,7 @@ export const useSosStore = create<SosState>((set, get) => ({
         await get().updateAlertStatus(
           newAlert.id,
           'queued',
-          'No peers currently reachable. Queued for auto-relay.'
+          'No peer confirmed receipt. Kept in the local outbox.'
         );
       }
     } catch (err) {

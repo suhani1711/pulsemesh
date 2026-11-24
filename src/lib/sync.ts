@@ -1,4 +1,4 @@
-import { dbGetOutboxQueue, dbRemoveFromOutbox, dbUpdateOutbox } from './db';
+import { dbGetOutboxQueue } from './db';
 
 export interface SyncResult {
   syncedCount: number;
@@ -13,49 +13,33 @@ export interface SyncService {
 }
 
 /**
- * Honest Mock Demo Sync Service
- * Clearly labelled DEMO endpoint that simulates background synchronization
- * when network connection is restored.
+ * Safe placeholder until a real, authenticated emergency backend exists.
+ *
+ * Being online does not mean an emergency message reached a coordinator.
+ * Never delete queued SOS records or report them as synced without a
+ * verifiable server acknowledgement.
  */
 export class DemoSyncService implements SyncService {
   async syncOutbox(): Promise<SyncResult> {
     const queue = await dbGetOutboxQueue();
+    const timestamp = Date.now();
+
     if (queue.length === 0) {
       return {
         syncedCount: 0,
         failedCount: 0,
-        timestamp: Date.now(),
+        timestamp,
         isDemoEndpoint: true,
-        message: 'Outbox is empty. No alerts or beacons pending sync.',
+        message: 'Outbox is empty. No alerts or beacons are pending.',
       };
     }
 
-    // Simulate network latency (400ms)
-    await new Promise((resolve) => setTimeout(resolve, 400));
-
-    let synced = 0;
-    let failed = 0;
-
-    for (const item of queue) {
-      try {
-        // Mark as synced by removing from outbox or updating state
-        await dbRemoveFromOutbox(item.id);
-        synced++;
-      } catch (err) {
-        item.attempts += 1;
-        item.lastAttemptAt = Date.now();
-        item.status = 'failed';
-        await dbUpdateOutbox(item);
-        failed++;
-      }
-    }
-
     return {
-      syncedCount: synced,
-      failedCount: failed,
-      timestamp: Date.now(),
+      syncedCount: 0,
+      failedCount: queue.length,
+      timestamp,
       isDemoEndpoint: true,
-      message: `Demo Sync completed: ${synced} record(s) processed by mock emergency cloud coordinator.`,
+      message: `No emergency server is configured. Kept ${queue.length} queued record(s) safely on this device; no delivery is claimed.`,
     };
   }
 }

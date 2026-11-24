@@ -31,6 +31,7 @@ export class MeshManager {
   public bleStub: BleTransportStub;
 
   private simulationActive = false;
+  private initialized = false;
 
   constructor() {
     this.localPeerId = generatePeerId();
@@ -50,6 +51,8 @@ export class MeshManager {
   }
 
   public async initialize(): Promise<void> {
+    if (this.initialized) return;
+    this.initialized = true;
     for (const transport of this.transports.values()) {
       await transport.initialize(
         (msg, transName) => this.handleIncomingMessage(msg, transName),
@@ -177,11 +180,12 @@ export class MeshManager {
       hopCount: 0,
     });
 
+    let sentAny = false;
     for (const transport of this.transports.values()) {
-      await transport.sendMessage(message);
+      if (await transport.sendMessage(message)) sentAny = true;
     }
 
-    return { success: true, peerCount: this.getAllPeers().length };
+    return { success: sentAny, peerCount: this.getAllPeers().length };
   }
 
   /**

@@ -42,15 +42,15 @@ PulseMesh adheres strictly to an honest disclosure policy. All features and stat
 
 | Capability | Real In-Browser Implementation | Simulated / Documented Demo |
 | :--- | :--- | :--- |
-| **Offline Persistence** | **REAL**: Alerts, queue, and contacts persist permanently across reloads in browser IndexedDB. | None. 100% local hardware storage. |
+| **Offline Persistence** | **REAL**: User-created alerts, outbox records, and contacts persist in browser IndexedDB across reloads. | No sample alerts or placeholder contacts are inserted into a new user's data. |
 | **P2P Multi-Tab Mesh** | **REAL**: Two or more browser tabs or windows on the same device exchange live beacons, SOS packets, and ACKs via `BroadcastChannel`. | None. Live inter-process communication. |
 | **Serverless WebRTC** | **REAL**: Two devices on the same Wi-Fi or LAN establish an ad-hoc RTCDataChannel by scanning/pasting QR code SDP offers/answers without signaling servers. | Public STUN servers are optional; works serverless on local subnets. |
 | **Bluetooth LE Mesh** | **STUB**: Documented stub in `BleTransport.stub.ts`. Explains why browsers cannot create BLE meshes. | **NOT SUPPORTED IN BROWSER**. Requires native React Native app. |
 | **Multi-Hop Relay** | **REAL**: Flooding algorithm with TTL decrement and message ID deduplication cache (`MeshManager`). | Simulated relay nodes (RelayNode-Alpha, Scout-7) are prominently badged `SIMULATED`. |
-| **Delivery ACKs** | **REAL**: Status only changes to `Delivered` when a confirmed peer ACK message is physically received. | Hops without confirmed real peers remain `Queued` or `Broadcast Locally`. |
+| **Delivery ACKs** | **REAL, peer-scoped**: Status changes to `Delivered` only after an ACK from a connected app peer. | This is not acknowledgement by emergency services or a rescue coordinator. |
 | **AI Casualty Triage** | **HEURISTIC DEMO**: Rule-based categorization + client-side canvas dominant color & brightness stats. | **SIMULATED RESULT**: Clearly badged. Never claims to make medical diagnoses. |
 | **SMS Fallback** | **REAL**: Generates GSM-7 payload (≤160 characters) and constructs standard `sms:` URI for the native OS. | **CANNOT CONFIRM DELIVERY**: Browser cannot verify if cellular carrier transmitted the SMS. Offers manual user checkbox. |
-| **Rescue Map Tiles** | **REAL**: OpenStreetMap tiles when online; automatic failover to tactical SVG schematic map when offline. | Relief stations in demo data are badged `DEMO`. Real user SOS alerts appear at exact GPS coordinates. |
+| **Rescue Map Tiles** | **REAL**: OpenStreetMap tiles when online; offline SVG schematic when offline. | Rescue stations in bundled sample data are marked `DEMO`; SOS coordinates require GPS or explicit manual confirmation. |
 
 ---
 

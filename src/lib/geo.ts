@@ -6,11 +6,12 @@ export interface GeoResult {
   isDenied?: boolean;
 }
 
-// Default fallback coordinates if user denies permission or browser has no GPS (Honolulu / Pacific disaster simulation or user location)
+// Neutral placeholder only. This is NOT a real location and must be confirmed
+// by GPS or manual entry before an SOS can be submitted.
 export const DEFAULT_COORDS: Coordinates = {
-  lat: 37.7749,
-  lng: -122.4194,
-  accuracy: 100,
+  lat: 0,
+  lng: 0,
+  accuracy: undefined,
   isManual: true,
 };
 
