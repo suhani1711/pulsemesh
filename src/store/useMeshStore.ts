@@ -1,6 +1,9 @@
 import { create } from 'zustand';
 import { PeerNode, RelayRecord } from '../types';
 import { meshManager } from '../lib/mesh/meshManager';
+import { useSosStore } from './useSosStore';
+
+let unsubscribeMeshListener: (() => void) | null = null;
 
 interface MeshState {
   peers: PeerNode[];
@@ -25,14 +28,21 @@ export const useMeshStore = create<MeshState>((set) => ({
   initMesh: async () => {
     await meshManager.initialize();
 
-    // Hook listeners
-    meshManager.addListener((event) => {
+    // Subscribe once: AppLayout can mount twice in React StrictMode.
+    if (!unsubscribeMeshListener) {
+      unsubscribeMeshListener = meshManager.addListener((event) => {
       if (event.type === 'peer_change') {
         set({ peers: event.data });
       } else if (event.type === 'relay') {
         set({ relayHistory: meshManager.getRelayHistory() });
+      } else if (event.type === 'ack') {
+        const originalMessageId = event.data?.payload?.originalMessageId;
+        if (typeof originalMessageId === 'string') {
+          void useSosStore.getState().markPeerAck(originalMessageId, event.data.senderName || 'Nearby peer');
+        }
       }
-    });
+      });
+    }
 
     set({
       peers: meshManager.getAllPeers(),
